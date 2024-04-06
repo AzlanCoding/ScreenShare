@@ -1,6 +1,8 @@
 # ScreenShare
 ### A simple browser to browser screen sharing application between 2 devices.
-ScreenShare is a simple screen sharing application between 2 desktop browsers through using WebRTC. It was created as a prototype for a component in the Integrated Classroom Hub (another prototype that has not been released yet).
+ScreenShare is a simple screen sharing application between 2 desktop browsers through using WebRTC. It was created as a prototype for a component in the Integrated Classroom Hub (another prototype that has not been released to the public). <br>
+This project is referenced heavily from [j0r1's page](https://research.edm.uhasselt.be/jori/page/Main/HomePage.html). Please see the refrences at the bottom of this document.
+
 ## Installation
 You can fork and run this project on [Repl.it](https://repl.it) through this [link](https://screenshare.azlancoding.repl.co).<br>
 Alternatively, you can use the commands below to clone this repo to run it locally from your computer.
@@ -27,4 +29,9 @@ After cloning, you must:
  ```
  ## Note
  ScreenShare requires HTTPS to run, therefore the ad-hoc server is required to allow ScreenShare to run. Without HTTPS [`getDisplayMedia()`](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia) may not work.
+
+ ## References:
+ 1. https://research.edm.uhasselt.be/jori/page/Misc/QtWebRTC.html
+ 2. https://research.edm.uhasselt.be/jori/qtwebrtc/sender.html
+ 3. https://research.edm.uhasselt.be/jori/qtwebrtc/receiver.html
  
