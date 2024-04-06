@@ -1,0 +1,147 @@
+<html>
+    <head>
+        <script>
+
+let pcConfig = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+let pc = null;
+let connected = false;
+
+function error(e)
+{
+    console.log("Error: " + e);
+}
+
+function start()
+{
+    if (pc)
+        return;
+
+    pc = new RTCPeerConnection(pcConfig);
+       
+    pc.ontrack = (obj) => {
+
+        // Since we're only sending video, this should not be triggered
+        console.log("ontrack");
+        console.log(obj);
+    }
+
+    pc.onicecandidate = (event) => {
+    
+        if (event.candidate)
+        {
+            let candidate = event.candidate; // has sdpMLineIndex, sdpMid, candidate
+            document.getElementById("icecandidates").value += JSON.stringify(candidate) + "\n";
+        }
+    }
+
+    navigator.mediaDevices.getDisplayMedia({video: true, audio: true}).then((stream) => {
+    
+        console.log("Got stream");
+        console.log(stream);
+
+        // Stream this!
+        pc.addStream(stream);
+
+        pc.createOffer().then((offer) => {
+        
+            pc.setLocalDescription(offer).then(() => {
+            
+                document.getElementById("offer").value = offer.sdp;
+                fetch(window.location.origin+"/getId?sdp="+encodeURIComponent(offer.sdp)).then(x => x.text()).then(y => document.getElementById("meetingId").value = y,setInterval(waitForClient,1000));
+
+            }).catch((error) => {
+                console.log("Error in setLocalDescription: " + error);
+            });
+        }).catch((error) => {
+            console.log("Error in createOffer: " + error);
+        });
+
+    }).catch((error) => {
+
+        console.log("Error in getUserMedia: " + error);
+    });
+}
+function waitForClient(){
+    if (connected == false){
+        fetch(window.location.origin+"/checkAns?id="+encodeURIComponent(document.getElementById("meetingId").value)).then(x => x.text()).then(y => waitForClient2(y))
+    }
+}
+
+function waitForClient2(ans){
+    if (ans == "wait"){
+        console.log("Waiting for client1");
+        return;
+    }
+    else{
+        console.log("Received Answer, now processing...");
+        document.getElementById("answer").value = ans;
+        processAnswer(ans);
+        fetch(window.location.origin+"/getIce?id="+encodeURIComponent(document.getElementById("meetingId").value)).then(x => x.text()).then(y => waitForClient3(y))
+    }
+}
+
+function waitForClient3(ice) {
+    if (ice == "wait"){
+        console.log("Waiting for client2");
+        return;
+    }
+    else{
+        console.log("Received ICE, now processing...");
+        document.getElementById("othericecandidates").value = ice;
+        processOtherIceCandidates(ice);
+        connected = true;
+    }
+    
+}
+
+function processAnswer(ans)
+{
+    let answer = ans//document.getElementById("answer").value;
+    let answerSdp = { "sdp": answer, "type": "answer" };
+
+    pc.setRemoteDescription(answerSdp).then(() => {
+        console.log("Answer processed successfully");
+    }).catch((error) => {
+        console.log("Error in setRemoteDescription: " + error);
+    });
+}
+
+function processOtherIceCandidates(ice)
+{
+    let candidates = /*document.getElementById("othericecandidates").value*/ice.split("\n");
+
+    for (let cand of candidates)
+    {
+        if (cand.trim().length == 0)
+            continue;
+
+        cand = JSON.parse(cand);
+        console.log(cand);
+        pc.addIceCandidate(cand);
+    }
+}
+
+        </script>
+    </head>
+    <body>
+        <h1>Sender</h1>
+        <table><tr><td><P>Meeting Id:</P></td><td><textarea id='meetingId' rows="1" cols="4"></textarea></td></tr></table>
+        <button onclick="start()">Start</button><button onclick="processAnswer()"hidden>Process answer</button>
+        <button onclick="processOtherIceCandidates()"hidden>Process remote ICE candidates</button>
+        <br>
+        <table>
+            <tr>
+                <td>This is the SDP data that will need to be sent to the other side<br>
+                    <textarea id="offer" rows="20" cols="60"></textarea></td>
+                <td>Paste the SDP info from the other side here and press 'process answer'<br>
+                    <textarea id="answer" rows="20" cols="60"></textarea></td>
+            </tr>
+            <tr>
+                <td>This is ICE info for the local host, we'll need to send it to the remote end<br>
+                    <textarea id="icecandidates" rows="10" cols="60"></textarea></td>
+                <td>Paste the ICE info from the remote host here and press 'process ICE candidates'<br>
+                    <textarea id="othericecandidates" rows="10" cols="60"></textarea></td>
+            </tr>
+        </table>
+    </body>
+</html>

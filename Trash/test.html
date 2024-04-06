@@ -1,0 +1,5 @@
+<script>
+let text = document.getElementById('test')
+text.value = fetch('https://ScreenShare.azlancoding.repl.co/').then(x => x.text()).then(y => document.getElementById("test").value = y);
+</script>
+<textarea id='test' rows="1" cols="15">

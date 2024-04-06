@@ -1,0 +1,129 @@
+
+<html>
+    <head>
+        <script>
+//orignial file from https://research.edm.uhasselt.be/jori/page/Misc/QtWebRTC.html
+let pcConfig = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+let pc = null;
+let mediaStream = null;
+let asyncOut = null;
+var offer;
+async function getOffer(req){
+    return fetch(req).then(x => x.text());
+}
+
+function error(e)
+{
+    console.log("Error: " + e);
+}
+
+function start()
+{
+    if (pc)
+        return;
+    //if (document.getElementById("meetingId"))
+    //    return;
+    if (document.getElementById("meetingId").value == '')
+        return;
+    let req = window.location.origin + "/connectId?id=" + document.getElementById("meetingId").value
+    alert(req);
+    offer = (async () => {alert("hihi");z = await getOffer(req);return z;})();
+    alert(offer);
+    alert("done!");
+    return;
+
+    pc = new RTCPeerConnection(pcConfig);
+       
+    pc.ontrack = (obj) => {
+    
+        console.log("ontack");
+        console.log(obj);
+
+        if (!mediaStream)
+        {
+            let video = document.getElementById("video");
+            mediaStream = new MediaStream();
+            video.srcObject = mediaStream;
+            video.play();
+        }
+
+        mediaStream.addTrack(obj.track);
+    }
+
+    pc.onicecandidate = (event) => {
+    
+        console.log("onicecandidate");
+        if (event.candidate)
+        {
+            let candidate = event.candidate; // has sdpMLineIndex, sdpMid, candidate
+            document.getElementById("icecandidates").value += JSON.stringify(candidate) + "\n";
+        }
+    }
+
+    //let offer = document.getElementById("offer").value;
+    let offerSdp = { "sdp": offer, "type": "offer" };
+
+    pc.setRemoteDescription(offerSdp).then(() => { 
+    
+        pc.createAnswer().then((answer) => {
+        
+            pc.setLocalDescription(answer).then(() => { 
+            
+                document.getElementById("answer").value = answer.sdp;
+
+            }).catch((error) => {
+                console.log("Error in setLocalDescription: " + error);
+            });
+        }).catch((error) => {
+            console.log("Error in createAnswer: " + error);
+        });
+    }).catch((error) => {
+        console.log("Error in setRemoteDescription: " + error);
+    });
+}
+
+function processOtherIceCandidates()
+{
+    let candidates = document.getElementById("othericecandidates").value.split("\n");
+
+    for (let cand of candidates)
+    {
+        if (cand.trim().length == 0)
+            continue;
+
+        cand = JSON.parse(cand);
+        console.log(cand);
+        pc.addIceCandidate(cand);
+    }
+}
+
+        </script>
+    </head>
+    <body>
+        <h1>Receiver</h1>
+        Video:<br>
+        <video id="video"></video><br>
+        <table>
+            <tr>
+                <td><p>Insert meeting id and press `Start`</p></td>
+                <td><textarea id="meetingId" rows="1" cols="4"></textarea></td>
+            </tr>
+        </table>
+        <button onclick="start()">Start</button>
+        <button onclick="processOtherIceCandidates()" hidden>Process remote ICE candidates</button><br>
+        <table>
+            <tr>
+                <td>Paste the SDP info from the sender here<br>
+                    <textarea id="offer" rows="20" cols="60"></textarea></td>
+                <td>Copy this answer back to the sender<br>
+                    <textarea id="answer" rows="20" cols="60"></textarea></td>
+            </tr>
+            <tr>
+                <td>This is ICE info for the local host, we'll need to send it to the remote end<br>
+                    <textarea id="icecandidates" rows="10" cols="60"></textarea></td>
+                <td>Paste the ICE info from the remote host here and press 'process ICE candidates'<br>
+                    <textarea id="othericecandidates" rows="10" cols="60"></textarea></td>
+            </tr>
+        </table>
+    </body>
+</html>

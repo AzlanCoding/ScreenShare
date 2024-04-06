@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScreenShare - Closed</title>
+  <link rel="stylesheet" href="/assets/bulma.min.css" />
+  <script src="/assets/jquery-1.10.2.js"></script>
+  <style>
+    html{
+      overflow-y : auto;
+  }
+  </style>
+</head>
+
+<body>
+  <section class="hero is-primary is-fullheight">
+
+    <div class="hero-head">
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/">
+      <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+    </a>
+
+    <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="navbarBasicExample" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="/">
+        Home
+      </a>
+      <a class="navbar-item" href="https://github.com/AzlanCoding/ScreenShare">
+        About
+      </a>
+      <a class="navbar-item" href="/Help">
+        Help
+      </a>
+    </div>
+
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons">
+          <a class="button is-light" id="hshare" onclick="document.getElementById('hshare').classList.add('is-loading')" href="./Share">
+            <strong>Start Sharing</strong>
+          </a>
+          <a class="button is-light" id="hjoin" onclick="document.getElementById('hjoin').classList.add('is-loading');" href="./Receive">
+            <strong>Join Sharing</strong>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+    </div>
+
+    <div class="hero-body">
+      <div class="container has-text-centered box">
+        <p class="title" style="color:#000000">Thank you for using ScreenShare!</p>
+        <a class="button is-success" id="start" onclick="document.getElementById('start').classList.add('is-loading');" href="../Share">Start another sharing</a>
+        <a class="button is-primary" id="join" onclick="document.getElementById('join').classList.add('is-loading');" href="../Receive">Join another sharing</a>
+        <a class="button is-danger" id="home" onclick="document.getElementById('home').classList.add('is-loading');" href="../">Go Home</a>
+        <!--div class="columns" >
+         <div class="column">
+           <div class="box content">
+           <h1>Share Screen</h1>
+           </div>
+         </div>
+         <div class="column">
+           <div class="box content">
+           <h1>Receive Screen</h1>
+           </div>
+         </div-->
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+<script>
+ $(document).ready(function() {
+
+  // Check for click events on the navbar burger icon
+  $(".navbar-burger").click(function() {
+
+    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+    $(".navbar-burger").toggleClass("is-active");
+    $(".navbar-menu").toggleClass("is-active");
+
+  });
+});
+</script>
+</html>
